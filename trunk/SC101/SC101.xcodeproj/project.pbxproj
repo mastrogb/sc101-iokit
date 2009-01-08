@@ -1,0 +1,412 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0B3ADCFE0E97652B00A8501E /* psan_wireformat.h in Headers */ = {isa = PBXBuildFile; fileRef = 0B3ADCFD0E97652B00A8501E /* psan_wireformat.h */; };
+		0B4A0A7A0F0E435000F30F72 /* config.h in Headers */ = {isa = PBXBuildFile; fileRef = 0B4A0A790F0E435000F30F72 /* config.h */; };
+		0B4A0AFA0F0E572800F30F72 /* ut_attach.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B4A0AF90F0E572800F30F72 /* ut_attach.m */; };
+		0B4A0AFE0F0E5A1F00F30F72 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B4A0AFD0F0E5A1F00F30F72 /* IOKit.framework */; };
+		0B4A0B020F0E5A2500F30F72 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B4A0B010F0E5A2500F30F72 /* Foundation.framework */; };
+		0B4A0B230F0E5D4F00F30F72 /* ut_attach in CopyFiles */ = {isa = PBXBuildFile; fileRef = 0B4A0AEE0F0E568400F30F72 /* ut_attach */; };
+		0BC64E190E9A4A6900C162A1 /* SC101Device.h in Headers */ = {isa = PBXBuildFile; fileRef = 0BC64E170E9A4A6900C162A1 /* SC101Device.h */; };
+		0BC64E1A0E9A4A6900C162A1 /* SC101Device.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0BC64E180E9A4A6900C162A1 /* SC101Device.cpp */; };
+		0BCB605C0F0B554300A2CEF7 /* SC101.icns in Resources */ = {isa = PBXBuildFile; fileRef = 0BCB605A0F0B554300A2CEF7 /* SC101.icns */; };
+		0BCB605D0F0B554300A2CEF7 /* SC101T.icns in Resources */ = {isa = PBXBuildFile; fileRef = 0BCB605B0F0B554300A2CEF7 /* SC101T.icns */; };
+		32D94FC60562CBF700B6AF17 /* SC101Driver.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A224C3EFF42367911CA2CB7 /* SC101Driver.h */; };
+		32D94FC80562CBF700B6AF17 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
+		32D94FCA0562CBF700B6AF17 /* SC101Driver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1A224C3FFF42367911CA2CB7 /* SC101Driver.cpp */; settings = {ATTRIBUTES = (); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		0B4A0B1E0F0E5CEE00F30F72 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 089C1669FE841209C02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0B4A0AED0F0E568400F30F72;
+			remoteInfo = ut_attach;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		0B4A0B290F0E5D5300F30F72 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 6;
+			files = (
+				0B4A0B230F0E5D4F00F30F72 /* ut_attach in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		089C167EFE841241C02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		0B3ADCFD0E97652B00A8501E /* psan_wireformat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = psan_wireformat.h; sourceTree = "<group>"; };
+		0B4A0A790F0E435000F30F72 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
+		0B4A0AEE0F0E568400F30F72 /* ut_attach */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ut_attach; sourceTree = BUILT_PRODUCTS_DIR; };
+		0B4A0AF90F0E572800F30F72 /* ut_attach.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ut_attach.m; sourceTree = "<group>"; };
+		0B4A0AFD0F0E5A1F00F30F72 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
+		0B4A0B010F0E5A2500F30F72 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		0BC64E170E9A4A6900C162A1 /* SC101Device.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SC101Device.h; sourceTree = "<group>"; };
+		0BC64E180E9A4A6900C162A1 /* SC101Device.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SC101Device.cpp; sourceTree = "<group>"; };
+		0BCB605A0F0B554300A2CEF7 /* SC101.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = SC101.icns; sourceTree = "<group>"; };
+		0BCB605B0F0B554300A2CEF7 /* SC101T.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = SC101T.icns; sourceTree = "<group>"; };
+		1A224C3EFF42367911CA2CB7 /* SC101Driver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SC101Driver.h; sourceTree = "<group>"; };
+		1A224C3FFF42367911CA2CB7 /* SC101Driver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SC101Driver.cpp; sourceTree = "<group>"; };
+		32D94FCF0562CBF700B6AF17 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		32D94FD00562CBF700B6AF17 /* SC101.kext */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SC101.kext; sourceTree = BUILT_PRODUCTS_DIR; };
+		8DA8362C06AD9B9200E5AC22 /* Kernel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Kernel.framework; path = /System/Library/Frameworks/Kernel.framework; sourceTree = "<absolute>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		0B4A0AEC0F0E568400F30F72 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0B4A0B020F0E5A2500F30F72 /* Foundation.framework in Frameworks */,
+				0B4A0AFE0F0E5A1F00F30F72 /* IOKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		32D94FCB0562CBF700B6AF17 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		089C166AFE841209C02AAC07 /* SC101 */ = {
+			isa = PBXGroup;
+			children = (
+				247142CAFF3F8F9811CA285C /* Source */,
+				8DA8362C06AD9B9200E5AC22 /* Kernel.framework */,
+				089C167CFE841241C02AAC07 /* Resources */,
+				19C28FB6FE9D52B211CA2CBB /* Products */,
+				0B4A0AFD0F0E5A1F00F30F72 /* IOKit.framework */,
+				0B4A0B010F0E5A2500F30F72 /* Foundation.framework */,
+			);
+			name = SC101;
+			sourceTree = "<group>";
+		};
+		089C167CFE841241C02AAC07 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				0BCB605A0F0B554300A2CEF7 /* SC101.icns */,
+				0BCB605B0F0B554300A2CEF7 /* SC101T.icns */,
+				32D94FCF0562CBF700B6AF17 /* Info.plist */,
+				089C167DFE841241C02AAC07 /* InfoPlist.strings */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		19C28FB6FE9D52B211CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				32D94FD00562CBF700B6AF17 /* SC101.kext */,
+				0B4A0AEE0F0E568400F30F72 /* ut_attach */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		247142CAFF3F8F9811CA285C /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				0B3ADCFD0E97652B00A8501E /* psan_wireformat.h */,
+				1A224C3EFF42367911CA2CB7 /* SC101Driver.h */,
+				1A224C3FFF42367911CA2CB7 /* SC101Driver.cpp */,
+				0BC64E170E9A4A6900C162A1 /* SC101Device.h */,
+				0BC64E180E9A4A6900C162A1 /* SC101Device.cpp */,
+				0B4A0A790F0E435000F30F72 /* config.h */,
+				0B4A0AF90F0E572800F30F72 /* ut_attach.m */,
+			);
+			name = Source;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		32D94FC50562CBF700B6AF17 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				32D94FC60562CBF700B6AF17 /* SC101Driver.h in Headers */,
+				0B3ADCFE0E97652B00A8501E /* psan_wireformat.h in Headers */,
+				0BC64E190E9A4A6900C162A1 /* SC101Device.h in Headers */,
+				0B4A0A7A0F0E435000F30F72 /* config.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		0B4A0AED0F0E568400F30F72 /* ut_attach */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0B4A0AF80F0E56C000F30F72 /* Build configuration list for PBXNativeTarget "ut_attach" */;
+			buildPhases = (
+				0B4A0AEB0F0E568400F30F72 /* Sources */,
+				0B4A0AEC0F0E568400F30F72 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ut_attach;
+			productName = ut_attach;
+			productReference = 0B4A0AEE0F0E568400F30F72 /* ut_attach */;
+			productType = "com.apple.product-type.tool";
+		};
+		32D94FC30562CBF700B6AF17 /* SC101 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1DEB91D908733DB10010E9CD /* Build configuration list for PBXNativeTarget "SC101" */;
+			buildPhases = (
+				32D94FC50562CBF700B6AF17 /* Headers */,
+				0B4A0B290F0E5D5300F30F72 /* CopyFiles */,
+				32D94FC70562CBF700B6AF17 /* Resources */,
+				32D94FC90562CBF700B6AF17 /* Sources */,
+				32D94FCB0562CBF700B6AF17 /* Frameworks */,
+				32D94FCC0562CBF700B6AF17 /* Rez */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				0B4A0B1F0F0E5CEE00F30F72 /* PBXTargetDependency */,
+			);
+			name = SC101;
+			productInstallPath = "$(SYSTEM_LIBRARY_DIR)/Extensions";
+			productName = SC101;
+			productReference = 32D94FD00562CBF700B6AF17 /* SC101.kext */;
+			productType = "com.apple.product-type.kernel-extension.iokit";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		089C1669FE841209C02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 1DEB91DD08733DB10010E9CD /* Build configuration list for PBXProject "SC101" */;
+			compatibilityVersion = "Xcode 3.1";
+			hasScannedForEncodings = 1;
+			mainGroup = 089C166AFE841209C02AAC07 /* SC101 */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				32D94FC30562CBF700B6AF17 /* SC101 */,
+				0B4A0AED0F0E568400F30F72 /* ut_attach */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		32D94FC70562CBF700B6AF17 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				32D94FC80562CBF700B6AF17 /* InfoPlist.strings in Resources */,
+				0BCB605C0F0B554300A2CEF7 /* SC101.icns in Resources */,
+				0BCB605D0F0B554300A2CEF7 /* SC101T.icns in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXRezBuildPhase section */
+		32D94FCC0562CBF700B6AF17 /* Rez */ = {
+			isa = PBXRezBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXRezBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		0B4A0AEB0F0E568400F30F72 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0B4A0AFA0F0E572800F30F72 /* ut_attach.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		32D94FC90562CBF700B6AF17 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				32D94FCA0562CBF700B6AF17 /* SC101Driver.cpp in Sources */,
+				0BC64E1A0E9A4A6900C162A1 /* SC101Device.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		0B4A0B1F0F0E5CEE00F30F72 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0B4A0AED0F0E568400F30F72 /* ut_attach */;
+			targetProxy = 0B4A0B1E0F0E5CEE00F30F72 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		089C167DFE841241C02AAC07 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				089C167EFE841241C02AAC07 /* English */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		0B4A0AF00F0E568500F30F72 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INSTALL_PATH = /usr/local/bin;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = ut_attach;
+			};
+			name = Debug;
+		};
+		0B4A0AF10F0E568500F30F72 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INSTALL_PATH = /usr/local/bin;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = ut_attach;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		1DEB91DA08733DB10010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1.0.0d1;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_PREPROCESS = YES;
+				INSTALL_PATH = "$(SYSTEM_LIBRARY_DIR)/Extensions";
+				MODULE_NAME = net.habitue.driver.SC101;
+				MODULE_VERSION = 1.0.0d1;
+				PRODUCT_NAME = SC101;
+				WRAPPER_EXTENSION = kext;
+			};
+			name = Debug;
+		};
+		1DEB91DB08733DB10010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CURRENT_PROJECT_VERSION = 1.0.0d1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_MODEL_TUNING = G5;
+				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_PREPROCESS = YES;
+				INSTALL_PATH = "$(SYSTEM_LIBRARY_DIR)/Extensions";
+				MODULE_NAME = net.habitue.driver.SC101;
+				MODULE_VERSION = 1.0.0d1;
+				PRODUCT_NAME = SC101;
+				WRAPPER_EXTENSION = kext;
+			};
+			name = Release;
+		};
+		1DEB91DE08733DB10010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = "-DDEBUG";
+				PREBINDING = NO;
+				SDKROOT = macosx10.5;
+			};
+			name = Debug;
+		};
+		1DEB91DF08733DB10010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = macosx10.5;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		0B4A0AF80F0E56C000F30F72 /* Build configuration list for PBXNativeTarget "ut_attach" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0B4A0AF00F0E568500F30F72 /* Debug */,
+				0B4A0AF10F0E568500F30F72 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1DEB91D908733DB10010E9CD /* Build configuration list for PBXNativeTarget "SC101" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB91DA08733DB10010E9CD /* Debug */,
+				1DEB91DB08733DB10010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1DEB91DD08733DB10010E9CD /* Build configuration list for PBXProject "SC101" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB91DE08733DB10010E9CD /* Debug */,
+				1DEB91DF08733DB10010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 089C1669FE841209C02AAC07 /* Project object */;
+}
