@@ -16,15 +16,18 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "SC101Driver.h"
-#include "SC101Device.h"
+#import "SC101Driver.h"
+#import "SC101Device.h"
 
 extern "C" {
-#include <sys/errno.h>
-#include <netinet/in.h>
-#include "psan_wireformat.h"
+#import <sys/errno.h>
+#import <netinet/in.h>
+#import "psan_wireformat.h"
 };
 
+
+static const OSSymbol *gSC101DriverSummonKey;
+static const OSSymbol *gSC101DeviceIDKey;
 
 static void socketUpcallHandler(socket_t so, void* cookie, int waitf);
 
@@ -44,7 +47,10 @@ OSDefineMetaClassAndStructors(net_habitue_driver_SC101, IOService)
 
 bool net_habitue_driver_SC101::start(IOService *provider)
 {
-  KDEBUG("Starting");
+  KINFO("Starting");
+  
+  gSC101DriverSummonKey = OSSymbol::withCString(kSC101DriverSummonKey);
+  gSC101DeviceIDKey = OSSymbol::withCString(kSC101DeviceIDKey);
   
   if (!super::start(provider))
     return false;
@@ -52,21 +58,21 @@ bool net_habitue_driver_SC101::start(IOService *provider)
   /* set up Event Loop to single thread all work */
   if (!setupEventLoop())
   {
-    KDEBUG("%s: Failed to set up event loop!", getName());
+    KINFO("%s: Failed to set up event loop!", getName());
     return false;
   }
   
   /* set up single shared UDP socket for all communications */
   if (!setupSocket())
   {
-    KDEBUG("%s: Failed to set up socket!", getName());
+    KINFO("%s: Failed to set up socket!", getName());
     return false;
   }
 
   /* create and initialize array for tracking outstanding requests by 16-bit seq# */
   if (!(outstanding = (struct outstanding **)IONew(struct outstanding *, INT16_MAX)))
   {
-    KDEBUG("%s: Failed to alloc outstanding array", getName());
+    KINFO("%s: Failed to alloc outstanding array", getName());
     return false;
   }
   bzero(outstanding, INT16_MAX * sizeof(struct outstanding *));
@@ -77,7 +83,7 @@ bool net_habitue_driver_SC101::start(IOService *provider)
   UInt64 now;
   clock_get_uptime(&now);
   _seq = now % INT16_MAX;
-  KDEBUG("Sequence#: %d", _seq);
+  KINFO("Sequence#: %d", _seq);
   
   registerService();
   
@@ -87,7 +93,7 @@ bool net_habitue_driver_SC101::start(IOService *provider)
 
 void net_habitue_driver_SC101::stop(IOService *provider)
 {
-  KDEBUG("Stopping");
+  KINFO("Stopping");
 
   cleanupEventLoop();
   cleanupSocket();
@@ -97,7 +103,7 @@ void net_habitue_driver_SC101::stop(IOService *provider)
     if (outstanding[i] == NULL)
       continue;
     
-    KDEBUG("killing outstanding[%d]", i);
+    KINFO("killing outstanding[%d]", i);
     
     struct outstanding *out = outstanding[i];
     unregisterPacketHandler(out);
@@ -122,12 +128,12 @@ IOReturn net_habitue_driver_SC101::setProperties(OSObject *properties)
   if (!dict)
     return kIOReturnBadArgument;
   
-  OSDictionary *summon = OSDynamicCast(OSDictionary, dict->getObject("SummonNub"));
+  OSDictionary *summon = OSDynamicCast(OSDictionary, dict->getObject(gSC101DriverSummonKey));
   
   if (!summon)
     return kIOReturnBadArgument;
   
-  KDEBUG("summoning nub");
+  KINFO("summoning nub");
   addClient(summon);
   
   return kIOReturnSuccess;
@@ -143,7 +149,7 @@ IOWorkLoop *net_habitue_driver_SC101::getWorkLoop()
 void net_habitue_driver_SC101::addClient(OSDictionary *table)
 {
   net_habitue_device_SC101 *nub = NULL;
-  OSString *id = OSDynamicCast(OSString, table->getObject("ID"));
+  OSString *id = OSDynamicCast(OSString, table->getObject(gSC101DeviceIDKey));
 
   OSIterator *childIterator = getClientIterator();
   
@@ -171,7 +177,7 @@ void net_habitue_driver_SC101::addClient(OSDictionary *table)
     nub = OSTypeAlloc(net_habitue_device_SC101);
     nub->init(table);
     if (!nub->attach(this))
-      KDEBUG("attach failed");
+      KINFO("attach failed");
     nub->registerService();
     nub->release();
   }
@@ -192,7 +198,7 @@ bool net_habitue_driver_SC101::setupEventLoop(void)
   
   if (!workLoop)
   {
-    KDEBUG("%s: Failed to getWorkLoop()", getName());
+    KINFO("%s: Failed to getWorkLoop()", getName());
     return false;
   }
   
@@ -201,13 +207,13 @@ bool net_habitue_driver_SC101::setupEventLoop(void)
   
   if (!_commandGate)
   {
-    KDEBUG("%s: Failed to create command gate!", getName());
+    KINFO("%s: Failed to create command gate!", getName());
     return false;
   }
   
   if (workLoop->addEventSource(_commandGate) != kIOReturnSuccess)
   {
-    KDEBUG("%s: Failed to add command gate to work loop!", getName());
+    KINFO("%s: Failed to add command gate to work loop!", getName());
     return false;
   }
   
@@ -217,13 +223,13 @@ bool net_habitue_driver_SC101::setupEventLoop(void)
   
   if (!_interruptSource)
   {
-    KDEBUG("%s: Failed to create interrupt event source!", getName());
+    KINFO("%s: Failed to create interrupt event source!", getName());
     return false;
   }
   
   if (workLoop->addEventSource(_interruptSource) != kIOReturnSuccess)
   {
-    KDEBUG("%s: Failed to add interrupt event source to work loop!", getName());
+    KINFO("%s: Failed to add interrupt event source to work loop!", getName());
     return false;
   }
   
@@ -233,13 +239,13 @@ bool net_habitue_driver_SC101::setupEventLoop(void)
   
   if (!_timerSource)
   {
-    KDEBUG("%s: Failed to create timer event source!", getName());
+    KINFO("%s: Failed to create timer event source!", getName());
     return false;
   }
   
   if (workLoop->addEventSource(_timerSource) != kIOReturnSuccess)
   {
-    KDEBUG("%s: Failed to add timer event source to work loop!", getName());
+    KINFO("%s: Failed to add timer event source to work loop!", getName());
     return false;
   }
   
@@ -317,13 +323,13 @@ bool net_habitue_driver_SC101::setupSocket(void)
     goto out;
   
   sock_getsockname(_so, (struct sockaddr *)&addr, sizeof(addr));
-  KDEBUG("%s: Listening on port *:%u", getName(), ntohs(addr.sin_port));
+  KINFO("%s: Listening on port *:%u", getName(), ntohs(addr.sin_port));
   
   return true;
   
 out:
   if (error)
-    KDEBUG("Error: %d", error);
+    KINFO("Error: %d", error);
   sock_close(_so);  
 
   return false;
@@ -391,13 +397,13 @@ void net_habitue_driver_SC101::receivePacket(void)
   
   if ((error = sock_receivembuf(_so, &msghdr, &m, MSG_DONTWAIT, &len)))
   {
-    KDEBUG("%s: error %d from sock_receivembuf", getName(), error);
+    KINFO("%s: error %d from sock_receivembuf", getName(), error);
     return;
   }
   
   if (len < sizeof(struct psan_ctrl_t))
   {
-    KDEBUG("%s: short packet len=%d", getName(), len);
+    KINFO("%s: short packet len=%zu", getName(), len);
     return;
   }
   
@@ -420,7 +426,7 @@ bool net_habitue_driver_SC101::sendPacket(struct sockaddr_in *dest, mbuf_t m, st
   
   if ((error = sock_sendmbuf(_so, &msghdr, m, 0, &sent)))
   {
-    KDEBUG("Error: sock_sendmbuf() returned %d", error);
+    KINFO("Error: sock_sendmbuf() returned %d", error);
     return false;
   }
   
@@ -431,7 +437,7 @@ bool net_habitue_driver_SC101::sendPacket(struct sockaddr_in *dest, mbuf_t m, st
 void net_habitue_driver_SC101::registerPacketHandler(struct outstanding *out)
 {
   if (outstanding[out->seq] != NULL)
-    KDEBUG("seq#%d already used!", out->seq); // TODO(iwade) handle
+    KINFO("seq#%d already used!", out->seq); // TODO(iwade) handle
   
   outstanding[out->seq] = out;
 
@@ -454,7 +460,7 @@ void net_habitue_driver_SC101::handlePacket(struct sockaddr_in *addr, mbuf_t m, 
   if (mbuf_len(m) < sizeof(struct psan_ctrl_t) &&
       mbuf_pullup(&m, sizeof(struct psan_ctrl_t)) != 0)
   {
-    KDEBUG("short packet, ignoring.");
+    KINFO("short packet, ignoring.");
     return;
   }
   
@@ -464,7 +470,7 @@ void net_habitue_driver_SC101::handlePacket(struct sockaddr_in *addr, mbuf_t m, 
   if (!out || ntohs(ctrl->seq) != out->seq || len != out->len || ctrl->cmd != out->cmd)
   {
     if (ctrl->cmd == PSAN_ERROR && out && out->timeout_ms) {
-      KDEBUG("Drive not ready, backing off for %d seconds", SPINUP_INTERVAL_MS/1000);
+      KINFO("Drive not ready, backing off for %d seconds", SPINUP_INTERVAL_MS/1000);
       
       removeTimeout(out);
       out->timeout_ms = SPINUP_INTERVAL_MS;

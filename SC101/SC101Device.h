@@ -1,26 +1,10 @@
-#pragma once
-#include "config.h"
+#import "config.h"
 
-#include <IOKit/storage/IOStorage.h>
-#include <IOKit/storage/IOBlockStorageDevice.h>
+#import <IOKit/storage/IOStorage.h>
+#import <IOKit/storage/IOBlockStorageDevice.h>
 
-#include "SC101Driver.h"
-
-
-// property keys
-#define kSC101DeviceIDKey "ID"
-#define kSC101DeviceIOMaxReadSizeKey "IOMaxReadSize"
-#define kSC101DeviceIOMaxWriteSizeKey "IOMaxWriteSize"
-#define kSC101DevicePartitionAddressKey "Partition Address"
-#define kSC101DeviceRootAddressKey "Root Address"
-#define kSC101DevicePartNumberKey "Part Number"
-#define kSC101DeviceVersionKey "Firmware Version"
-#define kSC101DeviceLabelKey "Label"
-#define kSC101DeviceSizeKey "Size"
-
-// part numbers
-#define kSC101PartNumber ((UInt8[3]){ 0, 0, 101 })
-#define kSC101TPartNumber ((UInt8[3]){ 0, 0, 102 })
+#import "SC101Driver.h"
+#import "SC101Keys.h"
 
 struct outstanding_io {
   OSData *addr;
@@ -37,7 +21,9 @@ struct outstanding_io {
   STAILQ_ENTRY(outstanding_io) entries;
 };
 
+
 STAILQ_HEAD(outstandingIOQueue, outstanding_io);
+
 
 class net_habitue_device_SC101 : public IOBlockStorageDevice
   {
@@ -82,13 +68,14 @@ class net_habitue_device_SC101 : public IOBlockStorageDevice
     /* main IO functions */
     void handleAsyncIOPacket(struct sockaddr_in *addr, mbuf_t m, size_t len, struct outstanding *out, void *ctx);
     void handleAsyncIOTimeout(struct outstanding *out, void *ctx);    
+    void safeDoAsyncReadWrite(IOMemoryDescriptor *buffer, UInt32 block, UInt32 nblks, IOStorageCompletion *completion);
     void prepareAndDoAsyncReadWrite(OSData *addr, IOMemoryDescriptor *buffer, UInt32 block, UInt32 nblks, IOStorageCompletion completion);
     void submitIO(struct outstanding_io *io);
     void doSubmitIO(struct outstanding_io *io);
     void completeIO(struct outstanding_io *io);
     void queueIO(struct outstanding_io *io);
     void dequeueAndSubmitIO();
-    void deblock(IOMemoryDescriptor *buffer, UInt32 block, UInt32 nblks, IOStorageCompletion completion);
+    void deblock(OSData *addr, IOMemoryDescriptor *buffer, UInt32 block, UInt32 nblks, IOStorageCompletion completion);
     
     void setIcon(OSString *resourceFile);
     

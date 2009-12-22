@@ -28,6 +28,11 @@
 #define KDEBUG(...)
 #endif /*DEBUG */
 
+#define KINFO(fmt, ...) do { \
+  kprintf("%s: " fmt "\n", __FUNCTION__, ## __VA_ARGS__); \
+  IOLog("%s: " fmt "\n", __FUNCTION__, ## __VA_ARGS__); \
+} while (0)
+
 // during debugging it might be useful to totally disable write requests
 // #define WRITEPROTECT
 
@@ -43,7 +48,7 @@
 // means the devices can probably support 32k I/Os, but we can choose a lower limit in case of packet loss.
 // jumbo frames are not supported, so UDP packets >1500 bytes are split into multiple ethernet frames.
 #define MAX_IO_READ_SIZE (16*1024)
-#define DEFAULT_IO_READ_SIZE (8*1024)
+#define DEFAULT_IO_READ_SIZE (16*1024)
 #define MAX_IO_WRITE_SIZE (16*1024)
 #define DEFAULT_IO_WRITE_SIZE (4*1024)
 
@@ -53,8 +58,8 @@
 #define ACCEPT_IO_WRITE_SIZE (1*1024*1024)
 
 // when reading a lot of data, particularly from multiple devices it might help to have a larger buffer.
-#define RCVBUF_SIZE (4*1024*1024)
-#define SNDBUF_SIZE (4*1024*1024)
+#define RCVBUF_SIZE (1*1024*1024)
+#define SNDBUF_SIZE (1*1024*1024)
 
 // ZFS reacts adversely (panic) to disks disappearing with uncommitted data, so we may choose to retry writes
 // indefinitely in case of (long lived) network problems.
