@@ -18,27 +18,44 @@
 
 #import <Foundation/Foundation.h>
 #import <IOKit/IOKitLib.h>
+#import <sysexits.h>
 
 
-#define SC101ServiceName "net_habitue_driver_SC101"
+#import "SC101Keys.h"
 
 
-int attach(char *idString, int readSize, int writeSize)
+int usage(char *err)
+{
+  if (err && *err)
+    fprintf(stderr, "Error: %s\n", err);
+  
+  fprintf(stderr, "Usage: helper <ACTION> [OPTIONS] [args..]\n");
+  fprintf(stderr, "\n");
+  fprintf(stderr, "  attach          tell kernel to attach to device\n");
+  fprintf(stderr, "    [-r LEN]        maximum IO read size\n");
+  fprintf(stderr, "    [-w LEN]        maximum IO write size\n");
+  fprintf(stderr, "    <UUID>...       uuid(s) to attach to\n");
+  
+  exit(EX_USAGE);
+}
+
+
+int doAttach(char *idString, int readSize, int writeSize)
 {
   NSMutableDictionary *summonNub = [NSMutableDictionary dictionary];
-  NSDictionary *properties = [NSDictionary dictionaryWithObject:summonNub forKey:@"SummonNub"];
+  NSDictionary *properties = [NSDictionary dictionaryWithObject:summonNub forKey:[NSString stringWithUTF8String:kSC101DriverSummonKey]];
   
-  [summonNub setObject:[NSString stringWithCString:idString encoding:NSUTF8StringEncoding] forKey:@"ID"];
+  [summonNub setObject:[NSString stringWithUTF8String:idString] forKey:[NSString stringWithUTF8String:kSC101DeviceIDKey]];
   if (readSize > 0)
-    [summonNub setObject:[NSNumber numberWithInt:readSize] forKey:@"IOMaxReadSize"];
+    [summonNub setObject:[NSNumber numberWithInt:readSize] forKey:[NSString stringWithUTF8String:kSC101DeviceIOMaxReadSizeKey]];
   if (writeSize > 0)
-    [summonNub setObject:[NSNumber numberWithInt:writeSize] forKey:@"IOMaxWriteSize"];
+    [summonNub setObject:[NSNumber numberWithInt:writeSize] forKey:[NSString stringWithUTF8String:kSC101DeviceIOMaxWriteSizeKey]];
   
   io_service_t driverObject = IO_OBJECT_NULL;
   kern_return_t ioStatus = kIOReturnSuccess;
   int ret = 1;
 
-  if (!(driverObject = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceNameMatching(SC101ServiceName))))
+  if (!(driverObject = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceNameMatching(kSC101DriverName))))
     goto cleanup;
   
   if ((ioStatus = IORegistryEntrySetCFProperties(driverObject, properties)) != kIOReturnSuccess)
@@ -61,24 +78,12 @@ cleanup:
 }
 
 
-int usage()
+int attach(int argc, char *argv[])
 {
-  fprintf(stderr, "Usage: ut_attach [OPTIONS] <DEVICE_ID>\n");
-  fprintf(stderr, "Options:\n");
-  fprintf(stderr, "  -r LEN      maximum IO read size\n");
-  fprintf(stderr, "  -w LEN      maximum IO write size\n");
-  return 1;
-}
-
-
-int main(int argc, char *argv[])
-{
-  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  int ret = 0;
   int readSize = -1;
   int writeSize = -1;
   int ch;
-
+  
   while ((ch = getopt(argc, argv, "r:w:")) != -1)
   {
     switch (ch) {
@@ -89,18 +94,40 @@ int main(int argc, char *argv[])
         writeSize = atoi(optarg);
         break;
       default:
-        usage();
+        usage(NULL);
     }
   }
-
+  
   argc -= optind;
   argv += optind;
   
-  if (argc == 1)
-    ret = attach(argv[0], readSize, writeSize);
-  else
-    ret = usage();
+  if (argc < 1)
+    usage("missing UUID");
+  
+  for (int i = 0; i < argc; i++)
+  {
+    int ret;
 
+    if ((ret = doAttach(argv[i], readSize, writeSize)) != 0)
+      return ret;
+  }
+
+  return 0;
+}
+
+
+int main(int argc, char *argv[])
+{
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+  int ret = 0;
+
+  if (argc < 2)
+    usage("missing action");
+  else if (!strcmp(argv[1], "attach"))
+    ret = attach(argc-1, argv+1);
+  else
+    usage("unknown action");
+  
   [pool release];
   
   return ret;

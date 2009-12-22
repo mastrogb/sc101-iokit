@@ -1,18 +1,19 @@
-#pragma once
-#include "config.h"
+#import "config.h"
 
-#include <IOKit/IOService.h>
-#include <IOKit/IOInterruptEventSource.h>
-#include <IOKit/IOTimerEventSource.h>
-#include <IOKit/IOCommandGate.h>
-#include <IOKit/storage/IOStorage.h>
-#include <IOKit/storage/IOBlockStorageDriver.h>
-#include <IOKit/storage/IOBlockStorageDevice.h>
+#import <IOKit/IOService.h>
+#import <IOKit/IOInterruptEventSource.h>
+#import <IOKit/IOTimerEventSource.h>
+#import <IOKit/IOCommandGate.h>
+#import <IOKit/storage/IOStorage.h>
+#import <IOKit/storage/IOBlockStorageDriver.h>
+#import <IOKit/storage/IOBlockStorageDevice.h>
+
+#import "SC101Keys.h"
 
 extern "C" {
-#include <sys/kpi_socket.h>
-#include <sys/kpi_mbuf.h>
-#include <sys/queue.h>
+#import <sys/kpi_socket.h>
+#import <sys/kpi_mbuf.h>
+#import <sys/queue.h>
 }
 
 typedef void (*PacketHandler)(OSObject *owner, struct sockaddr_in *addr, mbuf_t m, size_t len, struct outstanding *, void *ctx);

@@ -7,12 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0B3122560F5557CB0092C632 /* helper.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B4A0AF90F0E572800F30F72 /* helper.m */; };
+		0B3122580F5557F90092C632 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B4A0B010F0E5A2500F30F72 /* Foundation.framework */; };
+		0B3122620F5558220092C632 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B4A0AFD0F0E5A1F00F30F72 /* IOKit.framework */; };
 		0B3ADCFE0E97652B00A8501E /* psan_wireformat.h in Headers */ = {isa = PBXBuildFile; fileRef = 0B3ADCFD0E97652B00A8501E /* psan_wireformat.h */; };
 		0B4A0A7A0F0E435000F30F72 /* config.h in Headers */ = {isa = PBXBuildFile; fileRef = 0B4A0A790F0E435000F30F72 /* config.h */; };
-		0B4A0AFA0F0E572800F30F72 /* ut_attach.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B4A0AF90F0E572800F30F72 /* ut_attach.m */; };
-		0B4A0AFE0F0E5A1F00F30F72 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B4A0AFD0F0E5A1F00F30F72 /* IOKit.framework */; };
-		0B4A0B020F0E5A2500F30F72 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B4A0B010F0E5A2500F30F72 /* Foundation.framework */; };
-		0B4A0B230F0E5D4F00F30F72 /* ut_attach in CopyFiles */ = {isa = PBXBuildFile; fileRef = 0B4A0AEE0F0E568400F30F72 /* ut_attach */; };
 		0BC64E190E9A4A6900C162A1 /* SC101Device.h in Headers */ = {isa = PBXBuildFile; fileRef = 0BC64E170E9A4A6900C162A1 /* SC101Device.h */; };
 		0BC64E1A0E9A4A6900C162A1 /* SC101Device.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0BC64E180E9A4A6900C162A1 /* SC101Device.cpp */; };
 		0BCB605C0F0B554300A2CEF7 /* SC101.icns in Resources */ = {isa = PBXBuildFile; fileRef = 0BCB605A0F0B554300A2CEF7 /* SC101.icns */; };
@@ -22,35 +21,12 @@
 		32D94FCA0562CBF700B6AF17 /* SC101Driver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1A224C3FFF42367911CA2CB7 /* SC101Driver.cpp */; settings = {ATTRIBUTES = (); }; };
 /* End PBXBuildFile section */
 
-/* Begin PBXContainerItemProxy section */
-		0B4A0B1E0F0E5CEE00F30F72 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 089C1669FE841209C02AAC07 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 0B4A0AED0F0E568400F30F72;
-			remoteInfo = ut_attach;
-		};
-/* End PBXContainerItemProxy section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		0B4A0B290F0E5D5300F30F72 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 6;
-			files = (
-				0B4A0B230F0E5D4F00F30F72 /* ut_attach in CopyFiles */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin PBXFileReference section */
 		089C167EFE841241C02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		0B3122500F5557BB0092C632 /* helper */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = helper; sourceTree = BUILT_PRODUCTS_DIR; };
 		0B3ADCFD0E97652B00A8501E /* psan_wireformat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = psan_wireformat.h; sourceTree = "<group>"; };
 		0B4A0A790F0E435000F30F72 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
-		0B4A0AEE0F0E568400F30F72 /* ut_attach */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ut_attach; sourceTree = BUILT_PRODUCTS_DIR; };
-		0B4A0AF90F0E572800F30F72 /* ut_attach.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ut_attach.m; sourceTree = "<group>"; };
+		0B4A0AF90F0E572800F30F72 /* helper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = helper.m; sourceTree = "<group>"; };
 		0B4A0AFD0F0E5A1F00F30F72 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		0B4A0B010F0E5A2500F30F72 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		0BC64E170E9A4A6900C162A1 /* SC101Device.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SC101Device.h; sourceTree = "<group>"; };
@@ -65,12 +41,12 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		0B4A0AEC0F0E568400F30F72 /* Frameworks */ = {
+		0B31224E0F5557BB0092C632 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0B4A0B020F0E5A2500F30F72 /* Foundation.framework in Frameworks */,
-				0B4A0AFE0F0E5A1F00F30F72 /* IOKit.framework in Frameworks */,
+				0B3122580F5557F90092C632 /* Foundation.framework in Frameworks */,
+				0B3122620F5558220092C632 /* IOKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,7 +88,7 @@
 			isa = PBXGroup;
 			children = (
 				32D94FD00562CBF700B6AF17 /* SC101.kext */,
-				0B4A0AEE0F0E568400F30F72 /* ut_attach */,
+				0B3122500F5557BB0092C632 /* helper */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -126,7 +102,7 @@
 				0BC64E170E9A4A6900C162A1 /* SC101Device.h */,
 				0BC64E180E9A4A6900C162A1 /* SC101Device.cpp */,
 				0B4A0A790F0E435000F30F72 /* config.h */,
-				0B4A0AF90F0E572800F30F72 /* ut_attach.m */,
+				0B4A0AF90F0E572800F30F72 /* helper.m */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -148,20 +124,20 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		0B4A0AED0F0E568400F30F72 /* ut_attach */ = {
+		0B31224F0F5557BB0092C632 /* helper */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 0B4A0AF80F0E56C000F30F72 /* Build configuration list for PBXNativeTarget "ut_attach" */;
+			buildConfigurationList = 0B3122570F5557F50092C632 /* Build configuration list for PBXNativeTarget "helper" */;
 			buildPhases = (
-				0B4A0AEB0F0E568400F30F72 /* Sources */,
-				0B4A0AEC0F0E568400F30F72 /* Frameworks */,
+				0B31224D0F5557BB0092C632 /* Sources */,
+				0B31224E0F5557BB0092C632 /* Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = ut_attach;
-			productName = ut_attach;
-			productReference = 0B4A0AEE0F0E568400F30F72 /* ut_attach */;
+			name = helper;
+			productName = helper;
+			productReference = 0B3122500F5557BB0092C632 /* helper */;
 			productType = "com.apple.product-type.tool";
 		};
 		32D94FC30562CBF700B6AF17 /* SC101 */ = {
@@ -169,7 +145,6 @@
 			buildConfigurationList = 1DEB91D908733DB10010E9CD /* Build configuration list for PBXNativeTarget "SC101" */;
 			buildPhases = (
 				32D94FC50562CBF700B6AF17 /* Headers */,
-				0B4A0B290F0E5D5300F30F72 /* CopyFiles */,
 				32D94FC70562CBF700B6AF17 /* Resources */,
 				32D94FC90562CBF700B6AF17 /* Sources */,
 				32D94FCB0562CBF700B6AF17 /* Frameworks */,
@@ -178,7 +153,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				0B4A0B1F0F0E5CEE00F30F72 /* PBXTargetDependency */,
 			);
 			name = SC101;
 			productInstallPath = "$(SYSTEM_LIBRARY_DIR)/Extensions";
@@ -199,7 +173,7 @@
 			projectRoot = "";
 			targets = (
 				32D94FC30562CBF700B6AF17 /* SC101 */,
-				0B4A0AED0F0E568400F30F72 /* ut_attach */,
+				0B31224F0F5557BB0092C632 /* helper */,
 			);
 		};
 /* End PBXProject section */
@@ -228,11 +202,11 @@
 /* End PBXRezBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		0B4A0AEB0F0E568400F30F72 /* Sources */ = {
+		0B31224D0F5557BB0092C632 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0B4A0AFA0F0E572800F30F72 /* ut_attach.m in Sources */,
+				0B3122560F5557CB0092C632 /* helper.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -247,14 +221,6 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
-/* Begin PBXTargetDependency section */
-		0B4A0B1F0F0E5CEE00F30F72 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 0B4A0AED0F0E568400F30F72 /* ut_attach */;
-			targetProxy = 0B4A0B1E0F0E5CEE00F30F72 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
-
 /* Begin PBXVariantGroup section */
 		089C167DFE841241C02AAC07 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
@@ -267,7 +233,7 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		0B4A0AF00F0E568500F30F72 /* Debug */ = {
+		0B3122520F5557BB0092C632 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -279,6 +245,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
 				INSTALL_PATH = /usr/local/bin;
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,
@@ -286,11 +253,11 @@
 					AppKit,
 				);
 				PREBINDING = NO;
-				PRODUCT_NAME = ut_attach;
+				PRODUCT_NAME = helper;
 			};
 			name = Debug;
 		};
-		0B4A0AF10F0E568500F30F72 /* Release */ = {
+		0B3122530F5557BB0092C632 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -308,7 +275,7 @@
 					AppKit,
 				);
 				PREBINDING = NO;
-				PRODUCT_NAME = ut_attach;
+				PRODUCT_NAME = helper;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -327,6 +294,7 @@
 				INSTALL_PATH = "$(SYSTEM_LIBRARY_DIR)/Extensions";
 				MODULE_NAME = net.habitue.driver.SC101;
 				MODULE_VERSION = 1.0.0d1;
+				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = SC101;
 				WRAPPER_EXTENSION = kext;
 			};
@@ -336,6 +304,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CURRENT_PROJECT_VERSION = 1.0.0d1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_MODEL_TUNING = G5;
@@ -344,6 +313,8 @@
 				INSTALL_PATH = "$(SYSTEM_LIBRARY_DIR)/Extensions";
 				MODULE_NAME = net.habitue.driver.SC101;
 				MODULE_VERSION = 1.0.0d1;
+				OTHER_CFLAGS = "";
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				PRODUCT_NAME = SC101;
 				WRAPPER_EXTENSION = kext;
 			};
@@ -379,11 +350,11 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		0B4A0AF80F0E56C000F30F72 /* Build configuration list for PBXNativeTarget "ut_attach" */ = {
+		0B3122570F5557F50092C632 /* Build configuration list for PBXNativeTarget "helper" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				0B4A0AF00F0E568500F30F72 /* Debug */,
-				0B4A0AF10F0E568500F30F72 /* Release */,
+				0B3122520F5557BB0092C632 /* Debug */,
+				0B3122530F5557BB0092C632 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

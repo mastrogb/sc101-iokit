@@ -16,17 +16,15 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include <IOKit/IOBufferMemoryDescriptor.h>
-#include <IOKit/IOKitKeys.h>
+#import <IOKit/IOBufferMemoryDescriptor.h>
+#import <IOKit/IOKitKeys.h>
 
-#include "SC101Device.h"
+#import "SC101Device.h"
 
 extern "C" {
-#include <netinet/in.h>
-#include "psan_wireformat.h"
+#import <netinet/in.h>
+#import "psan_wireformat.h"
 };
-
-#define kCFBundleIdentifierKey "CFBundleIdentifier"
 
 static const OSSymbol *gSC101DeviceIDKey;
 static const OSSymbol *gSC101DeviceIOMaxReadSizeKey;
@@ -47,40 +45,42 @@ static const OSSymbol *gSC101DeviceSizeKey;
 OSDefineMetaClassAndStructors(net_habitue_device_SC101, IOBlockStorageDevice)
 
 
+static void *IOMallocZero(int len)
+{
+  void *buf = IOMalloc(len);
+  if (!buf)
+    panic("alloc failed");
+  bzero(buf, len);
+  return buf;
+}
+#define IONewZero(type, number) (type*)IOMallocZero(sizeof(type) * (number))
+
+
 /**********************************************************************************************************************************/
 #pragma mark IOService stubs
 /**********************************************************************************************************************************/
 
 bool net_habitue_device_SC101::init(OSDictionary *properties)
 {
-  KDEBUG("init");
+  KINFO("init");
 
-  OSString *id = OSDynamicCast(OSString, properties->getObject("ID"));
+  gSC101DeviceIDKey = OSSymbol::withCString(kSC101DeviceIDKey);
+  gSC101DeviceIOMaxReadSizeKey = OSSymbol::withCString(kSC101DeviceIOMaxReadSizeKey);
+  gSC101DeviceIOMaxWriteSizeKey = OSSymbol::withCString(kSC101DeviceIOMaxWriteSizeKey);
+  gSC101DevicePartitionAddressKey = OSSymbol::withCString(kSC101DevicePartitionAddressKey);
+  gSC101DeviceRootAddressKey = OSSymbol::withCString(kSC101DeviceRootAddressKey);
+  gSC101DevicePartNumberKey = OSSymbol::withCString(kSC101DevicePartNumberKey);
+  gSC101DeviceVersionKey = OSSymbol::withCString(kSC101DeviceVersionKey);
+  gSC101DeviceLabelKey = OSSymbol::withCString(kSC101DeviceLabelKey);
+  gSC101DeviceSizeKey = OSSymbol::withCString(kSC101DeviceSizeKey);
+  
+  OSString *id = OSDynamicCast(OSString, properties->getObject(gSC101DeviceIDKey));
   if (!id)
     return false;
   
   if (!super::init(properties))
     return false;
   
-  if (!gSC101DeviceIDKey)
-    gSC101DeviceIDKey = OSSymbol::withCString(kSC101DeviceIDKey);
-  if (!gSC101DeviceIOMaxReadSizeKey)
-    gSC101DeviceIOMaxReadSizeKey = OSSymbol::withCString(kSC101DeviceIOMaxReadSizeKey);
-  if (!gSC101DeviceIOMaxWriteSizeKey)
-    gSC101DeviceIOMaxWriteSizeKey = OSSymbol::withCString(kSC101DeviceIOMaxWriteSizeKey);
-  if (!gSC101DevicePartitionAddressKey)
-    gSC101DevicePartitionAddressKey = OSSymbol::withCString(kSC101DevicePartitionAddressKey);
-  if (!gSC101DeviceRootAddressKey)
-    gSC101DeviceRootAddressKey = OSSymbol::withCString(kSC101DeviceRootAddressKey);
-  if (!gSC101DevicePartNumberKey)
-    gSC101DevicePartNumberKey = OSSymbol::withCString(kSC101DevicePartNumberKey);
-  if (!gSC101DeviceVersionKey)
-    gSC101DeviceVersionKey = OSSymbol::withCString(kSC101DeviceVersionKey);
-  if (!gSC101DeviceLabelKey)
-    gSC101DeviceLabelKey = OSSymbol::withCString(kSC101DeviceLabelKey);
-  if (!gSC101DeviceSizeKey)
-    gSC101DeviceSizeKey = OSSymbol::withCString(kSC101DeviceSizeKey);
-
   OSNumber *ioMaxReadSize = OSDynamicCast(OSNumber, properties->getObject(gSC101DeviceIOMaxReadSizeKey));
   
   if (!ioMaxReadSize ||
@@ -122,7 +122,7 @@ bool net_habitue_device_SC101::init(OSDictionary *properties)
   _pendingCount = 0;
   STAILQ_INIT(&_outstandingHead);
   _outstandingCount = 0;
-  
+
   return true;
 }
 
@@ -144,12 +144,19 @@ bool net_habitue_device_SC101::attach(IOService *provider)
 
 IOReturn net_habitue_device_SC101::doAsyncReadWrite(IOMemoryDescriptor *buffer, UInt32 block, UInt32 nblks, IOStorageCompletion completion)
 {
-  OSData *addr = OSDynamicCast(OSData, getProperty(gSC101DevicePartitionAddressKey));
-  addr->retain();
-  
-  prepareAndDoAsyncReadWrite(addr, buffer, block, nblks, completion);
+  /* run on workloop */
+  getWorkLoop()->runAction(OSMemberFunctionCast(Action, this, &net_habitue_device_SC101::safeDoAsyncReadWrite),
+                           this, (void*)buffer, (void*)block, (void*)nblks, (void*)&completion);
 
   return kIOReturnSuccess;
+}
+
+
+void net_habitue_device_SC101::safeDoAsyncReadWrite(IOMemoryDescriptor *buffer, UInt32 block, UInt32 nblks, IOStorageCompletion *completion)
+{
+  OSData *addr = OSDynamicCast(OSData, getProperty(gSC101DevicePartitionAddressKey));
+  
+  prepareAndDoAsyncReadWrite(addr, buffer, block, nblks, *completion);
 }
 
 
@@ -188,21 +195,21 @@ IOReturn net_habitue_device_SC101::doSynchronizeCache(void)
 
 char *net_habitue_device_SC101::getVendorString(void)
 {
-  return "Netgear";
+  return (char *)"Netgear";
 }
 
 
 char *net_habitue_device_SC101::getProductString(void)
 {
   OSData *partNumber = OSDynamicCast(OSData, getProperty(gSC101DevicePartNumberKey));
-  char *productString = "Unknown";
+  char *productString = (char *)"Unknown";
   
   if (partNumber)
   {
     if (partNumber->isEqualTo(kSC101PartNumber, sizeof(kSC101PartNumber)))
-      productString = "SC101";
+      productString = (char *)"SC101";
     else if (partNumber->isEqualTo(kSC101TPartNumber, sizeof(kSC101TPartNumber)))
-      productString = "SC101T";
+      productString = (char *)"SC101T";
   }
   
   return productString;
@@ -281,7 +288,7 @@ IOReturn net_habitue_device_SC101::reportMediaState(bool *mediaPresent, bool *ch
 
   if (_mediaStateChanged)
   {
-    KDEBUG("media now %s", _mediaStateAttached ? "present" : "missing");
+    KINFO("media now %s", _mediaStateAttached ? "present" : "missing");
     _mediaStateChanged = false;
   }
 
@@ -309,7 +316,7 @@ IOReturn net_habitue_device_SC101::reportRemovability(bool *isRemovable)
 IOReturn net_habitue_device_SC101::reportWriteProtection(bool *isWriteProtected)
 {
 #ifdef WRITEPROTECT
-  KDEBUG("true");
+  KINFO("true");
   *isWriteProtected = true;
 #else
   *isWriteProtected = false;
@@ -351,7 +358,8 @@ static struct {
   UInt32 timeout_ms;
   UInt32 tries;
 } retry_plan[] = {
-  {  250,  1 },
+  // {  100,  1 },
+  // WD10EACS can take ~380ms(?!) for initial response while in power saving mode.
   {  500,  1 },
   { 1000,  1 },
   { 3000, 20 },
@@ -380,14 +388,14 @@ static UInt32 getNextTimeoutMS(UInt32 attempt, bool isWrite)
 }
 
 
-static bool mbuf_buffer(IOMemoryDescriptor *buffer, UInt32 skip_buffer, mbuf_t m, UInt32 skip_mbuf, UInt32 copy)
+static bool mbuf_buffer(IOMemoryDescriptor *buffer, int skip_buffer, mbuf_t m, int skip_mbuf, int copy)
 {
-  UInt32 offset = 0;
+  int offset = 0;
   bool isWrite = (buffer->getDirection() == kIODirectionOut);
   
   if (buffer->prepare() != kIOReturnSuccess)
   {
-    KDEBUG("buffer prepare failed");
+    KINFO("buffer prepare failed");
     return false;
   }
   
@@ -429,7 +437,7 @@ static bool mbuf_buffer(IOMemoryDescriptor *buffer, UInt32 skip_buffer, mbuf_t m
 
     if (wrote != len)
     {
-      KDEBUG("short IO");
+      KINFO("short IO");
       break;
     }
     
@@ -440,13 +448,13 @@ static bool mbuf_buffer(IOMemoryDescriptor *buffer, UInt32 skip_buffer, mbuf_t m
   
   if (buffer->complete() != kIOReturnSuccess)
   {
-    KDEBUG("buffer complete failed");
+    KINFO("buffer complete failed");
     return false;
   }
 
   if (copy > 0)
   {
-    KDEBUG("failed to copy requested data: %d remaining", copy);
+    KINFO("failed to copy requested data: %d remaining", copy);
     return false;
   }
   
@@ -480,25 +488,22 @@ void net_habitue_device_SC101::resolve()
   KDEBUG("resolving");
   clock_get_uptime(&_lastResolve);
   
-  struct sockaddr_in addr;
+  sockaddr_in addr;
   bzero(&addr, sizeof(addr));
   addr.sin_len = sizeof(addr);
   addr.sin_family = AF_INET;
   addr.sin_port = htons(PSAN_PORT);
   addr.sin_addr.s_addr = INADDR_BROADCAST;
 
-  struct psan_resolve_t req;
+  psan_resolve_t req;
   bzero(&req, sizeof(req));
   req.ctrl.cmd = PSAN_RESOLVE;
   req.ctrl.seq = ((net_habitue_driver_SC101 *)getProvider())->getSequenceNumber();
   strncpy(req.id, getID()->getCStringNoCopy(), sizeof(req.id));
   
-  struct outstanding *out = IONew(struct outstanding, 1);
-  if (!out)
-    ; // TODO(iwade) handle
-  bzero(out, sizeof(*out));
+  outstanding *out = IONewZero(outstanding, 1);
   out->seq = ntohs(req.ctrl.seq);
-  out->len = sizeof(struct psan_resolve_response_t);
+  out->len = sizeof(psan_resolve_response_t);
   out->cmd = PSAN_RESOLVE_RESPONSE;
   out->packetHandler = OSMemberFunctionCast(PacketHandler, this, &net_habitue_device_SC101::handleResolvePacket);
   out->timeoutHandler = OSMemberFunctionCast(TimeoutHandler, this, &net_habitue_device_SC101::handleResolveTimeout);
@@ -507,11 +512,11 @@ void net_habitue_device_SC101::resolve()
   
   mbuf_t m;
 
-  if (mbuf_allocpacket(MBUF_WAITOK, sizeof(struct psan_resolve_t), NULL, &m) != 0)
-    KDEBUG("mbuf_allocpacket failed!"); // TODO(iwade) handle
+  if (mbuf_allocpacket(MBUF_WAITOK, sizeof(psan_resolve_t), NULL, &m) != 0)
+    KINFO("mbuf_allocpacket failed!"); // TODO(iwade) handle
 
   if (mbuf_copyback(m, 0, sizeof(req), &req, MBUF_WAITOK) != 0)
-    KDEBUG("mbuf_copyback failed!"); // TODO(iwade) handle
+    KINFO("mbuf_copyback failed!"); // TODO(iwade) handle
   
   ((net_habitue_driver_SC101 *)getProvider())->sendPacket(&addr, m, out);
 }
@@ -530,22 +535,22 @@ void net_habitue_device_SC101::retryResolve()
 }
 
 
-void net_habitue_device_SC101::handleResolvePacket(struct sockaddr_in *addr, mbuf_t m, size_t len, struct outstanding *out, void *ctx)
+void net_habitue_device_SC101::handleResolvePacket(sockaddr_in *addr, mbuf_t m, size_t len, outstanding *out, void *ctx)
 {
   clock_get_uptime(&_lastReply);
   
   if (mbuf_len(m) < out->len &&
       mbuf_pullup(&m, out->len) != 0)
   {
-    KDEBUG("pullup failed");
+    KINFO("pullup failed");
     return;
   }
   
   KDEBUG("resolve succeeded!");
   
-  struct psan_resolve_response_t *res = (struct psan_resolve_response_t *)mbuf_data(m);
+  psan_resolve_response_t *res = (psan_resolve_response_t *)mbuf_data(m);
   
-  struct sockaddr_in part;
+  sockaddr_in part;
   bzero(&part, sizeof(part));
   part.sin_len = sizeof(part);
   part.sin_family = AF_INET;
@@ -566,7 +571,7 @@ void net_habitue_device_SC101::handleResolvePacket(struct sockaddr_in *addr, mbu
     rootData->release();
   }
   
-  IODelete(out, struct outstanding, 1);
+  IODelete(out, outstanding, 1);
   
   mbuf_freem(m);
 
@@ -575,11 +580,11 @@ void net_habitue_device_SC101::handleResolvePacket(struct sockaddr_in *addr, mbu
 }
 
 
-void net_habitue_device_SC101::handleResolveTimeout(struct outstanding *out, void *ctx)
+void net_habitue_device_SC101::handleResolveTimeout(outstanding *out, void *ctx)
 {
-  KDEBUG("resolve timed out, no such ID '%s'?", getID()->getCStringNoCopy());
+  KINFO("resolve timed out, no such ID '%s'?", getID()->getCStringNoCopy());
   
-  IODelete(out, struct outstanding, 1);
+  IODelete(out, outstanding, 1);
   
   // TODO(iwade) detach if never successfully resolved.
 }
@@ -593,7 +598,7 @@ void net_habitue_device_SC101::disk()
   
   IOBufferMemoryDescriptor *buffer = IOBufferMemoryDescriptor::withCapacity(nblks * SECTOR_SIZE, kIODirectionIn);
   if (!buffer)
-    ; // TODO(iwade) handle
+    panic("alloc failed"); // TODO(iwade) handle
   
   IOStorageCompletion completion;
   completion.target = this;
@@ -601,7 +606,6 @@ void net_habitue_device_SC101::disk()
   completion.parameter = buffer;
 
   OSData *addr = OSDynamicCast(OSData, getProperty(gSC101DeviceRootAddressKey));
-  addr->retain();
 
   prepareAndDoAsyncReadWrite(addr, buffer, block, nblks, completion);
 }
@@ -609,15 +613,15 @@ void net_habitue_device_SC101::disk()
 
 void net_habitue_device_SC101::diskCompletion(void *parameter, IOReturn status, UInt64 actualByteCount)
 {
-  IOBufferMemoryDescriptor *buffer = (IOBufferMemoryDescriptor *)parameter;
-  
   if (status != kIOReturnSuccess || actualByteCount != sizeof(psan_get_response_disk_t))
   {
-    KDEBUG("disk query on %s failed", getID()->getCStringNoCopy());
-    goto cleanup;
+    KINFO("disk query on %s failed", getID()->getCStringNoCopy());
+    return;
   }
   
-  struct psan_get_response_disk_t *disk = (struct psan_get_response_disk_t *)buffer->getBytesNoCopy();
+  IOBufferMemoryDescriptor *buffer = (IOBufferMemoryDescriptor *)parameter;
+  
+  psan_get_response_disk_t *disk = (psan_get_response_disk_t *)buffer->getBytesNoCopy();
   
   OSData *partNumber = OSData::withBytes(disk->part_number, sizeof(disk->part_number));
   if (partNumber)
@@ -647,9 +651,6 @@ void net_habitue_device_SC101::diskCompletion(void *parameter, IOReturn status, 
   }
   
   partition(disk->partitions);
-  
-cleanup:
-  buffer->release();
 }
 
 
@@ -660,7 +661,7 @@ void net_habitue_device_SC101::partition(UInt8 partitions)
   
   IOBufferMemoryDescriptor *buffer = IOBufferMemoryDescriptor::withCapacity(nblks * SECTOR_SIZE, kIODirectionIn);
   if (!buffer)
-    ; // TODO(iwade) handle
+    panic("alloc failed"); // TODO(iwade) handle
   
   IOStorageCompletion completion;
   completion.target = this;
@@ -668,7 +669,6 @@ void net_habitue_device_SC101::partition(UInt8 partitions)
   completion.parameter = buffer;
   
   OSData *addr = OSDynamicCast(OSData, getProperty(gSC101DeviceRootAddressKey));
-  addr->retain();
 
   prepareAndDoAsyncReadWrite(addr, buffer, block, nblks, completion);
 }
@@ -676,18 +676,18 @@ void net_habitue_device_SC101::partition(UInt8 partitions)
 /* read the <partition#> sector on the root address for label and size */
 void net_habitue_device_SC101::partitionCompletion(void *parameter, IOReturn status, UInt64 actualByteCount)
 {
-  IOBufferMemoryDescriptor *buffer = (IOBufferMemoryDescriptor *)parameter;
-  
-  if (status != kIOReturnSuccess || actualByteCount != sizeof(struct psan_get_response_partition_t))
+  if (status != kIOReturnSuccess || actualByteCount != sizeof(psan_get_response_partition_t))
   {
-    KDEBUG("partition lookup on %s failed", getID()->getCStringNoCopy());
-    goto cleanup;
+    KINFO("partition lookup on %s failed", getID()->getCStringNoCopy());
+    return;
   }
   
-  struct psan_get_response_partition_t *part = (struct psan_get_response_partition_t *)buffer->getBytesNoCopy();
+  IOBufferMemoryDescriptor *buffer = (IOBufferMemoryDescriptor *)parameter;
+  
+  psan_get_response_partition_t *part = (psan_get_response_partition_t *)buffer->getBytesNoCopy();
   OSString *id = getID();
 
-  for (UInt32 i = 0; i < actualByteCount / sizeof(struct psan_get_response_partition_t); i++, part++)
+  for (UInt32 i = 0; i < actualByteCount / sizeof(psan_get_response_partition_t); i++, part++)
   {
     KDEBUG("cmp %s", part->id);
     
@@ -718,16 +718,13 @@ void net_habitue_device_SC101::partitionCompletion(void *parameter, IOReturn sta
 
     break;
   }
-  
-cleanup:
-  buffer->release();
 }
 
-void net_habitue_device_SC101::handleAsyncIOPacket(struct sockaddr_in *addr, mbuf_t m, size_t len, struct outstanding *out, void *ctx)
+void net_habitue_device_SC101::handleAsyncIOPacket(sockaddr_in *addr, mbuf_t m, size_t len, outstanding *out, void *ctx)
 {  
   clock_get_uptime(&_lastReply);
   
-  struct outstanding_io *io = (struct outstanding_io *)ctx;
+  outstanding_io *io = (outstanding_io *)ctx;
   bool isWrite = (io->buffer->getDirection() == kIODirectionOut);
   UInt32 ioLen = (io->nblks * SECTOR_SIZE);
   
@@ -745,18 +742,18 @@ void net_habitue_device_SC101::handleAsyncIOPacket(struct sockaddr_in *addr, mbu
   {
     //KDEBUG("%p read %d %d", io, io->block, io->nblks);
 
-    if (mbuf_buffer(io->buffer, 0, m, sizeof(struct psan_get_response_t), ioLen))
+    if (mbuf_buffer(io->buffer, 0, m, sizeof(psan_get_response_t), ioLen))
       status = kIOReturnSuccess;
     else
-      KDEBUG("mbuf_buffer failed");
+      KINFO("mbuf_buffer failed");
   }
   
   if (status != kIOReturnSuccess)
-    KDEBUG("%p FAILED", io);
+    KINFO("%p FAILED", io);
 
   completeIO(io);
   io->addr->release();
-  IODelete(io, struct outstanding_io, 1);
+  IODelete(io, outstanding_io, 1);
   
   mbuf_freem(m);
   
@@ -764,9 +761,9 @@ void net_habitue_device_SC101::handleAsyncIOPacket(struct sockaddr_in *addr, mbu
 }
 
 
-void net_habitue_device_SC101::handleAsyncIOTimeout(struct outstanding *out, void *ctx)
+void net_habitue_device_SC101::handleAsyncIOTimeout(outstanding *out, void *ctx)
 {
-  struct outstanding_io *io = (struct outstanding_io *)ctx;
+  outstanding_io *io = (outstanding_io *)ctx;
   IOStorageCompletion completion = io->completion;
   bool isWrite = (io->buffer->getDirection() == kIODirectionOut);
   
@@ -775,19 +772,22 @@ void net_habitue_device_SC101::handleAsyncIOTimeout(struct outstanding *out, voi
   
   if (io->timeout_ms)
   {
-    KDEBUG("retry IO (%p, %d, %d)", io, io->attempt, io->timeout_ms);
+    if (io->attempt > 3)
+      KINFO("retry IO (%p, %d, %d)", io, io->attempt, io->timeout_ms);
+    else
+      KDEBUG("retry IO (%p, %d, %d)", io, io->attempt, io->timeout_ms);
     // IOBlockStorageDriver::incrementRetries(isWrite)
     
     doSubmitIO(io);
     return;
   }
   
-  KDEBUG("abort IO %p", io);
+  KINFO("abort IO %p", io);
   // IOBlockStorageDriver::incrementErrors(isWrite)
   
   completeIO(io);
   io->addr->release();
-  IODelete(io, struct outstanding_io, 1);
+  IODelete(io, outstanding_io, 1);
 
   IOStorage::complete(completion, kIOReturnNotResponding, 0);
 }
@@ -804,18 +804,15 @@ void net_habitue_device_SC101::prepareAndDoAsyncReadWrite(OSData *addr, IOMemory
   if (isWrite)
     panic();
 #endif
-  
+
   if (ioSize > ioMaxSize || ioSize & (ioSize - 1))
   {
-    //KDEBUG("%s size=%llu, deblocking", (isWrite ? "write" : "read"), ioSize);
-    deblock(buffer, block, nblks, completion);
+    KDEBUG("%s size=%llu, deblocking", (isWrite ? "write" : "read"), ioSize);
+    deblock(addr, buffer, block, nblks, completion);
     return;
   }
   
-  struct outstanding_io *io = IONew(struct outstanding_io, 1);
-  if (!io)
-    ; // TODO(iwade) handle
-  bzero(io, sizeof(*io));
+  outstanding_io *io = IONewZero(outstanding_io, 1);
   io->addr = addr;
   io->buffer = buffer;
   io->block = block;
@@ -824,10 +821,12 @@ void net_habitue_device_SC101::prepareAndDoAsyncReadWrite(OSData *addr, IOMemory
   io->attempt = 0;
   io->timeout_ms = getNextTimeoutMS(io->attempt, isWrite);
   
+  io->addr->retain();
+  
   getWorkLoop()->runAction(OSMemberFunctionCast(Action, this, &net_habitue_device_SC101::submitIO), this, io);
 }
 
-void net_habitue_device_SC101::submitIO(struct outstanding_io *io)
+void net_habitue_device_SC101::submitIO(outstanding_io *io)
 {
   if (_outstandingCount >= MAX_IO_OUTSTANDING)
   {
@@ -841,7 +840,7 @@ void net_habitue_device_SC101::submitIO(struct outstanding_io *io)
   doSubmitIO(io);
 }
 
-void net_habitue_device_SC101::doSubmitIO(struct outstanding_io *io)
+void net_habitue_device_SC101::doSubmitIO(outstanding_io *io)
 {
   bool isWrite = (io->buffer->getDirection() == kIODirectionOut);
   UInt32 ioLen = (io->nblks * SECTOR_SIZE);
@@ -851,9 +850,9 @@ void net_habitue_device_SC101::doSubmitIO(struct outstanding_io *io)
   
   if (isWrite)
   {
-    //KDEBUG("%p write %d %d (%d)", io, io->block, io->nblks, _outstandingCount);
+    KDEBUG("%p write %d %d (%d)", io, io->block, io->nblks, _outstandingCount);
     
-    struct psan_put_t req;
+    psan_put_t req;
     bzero(&req, sizeof(req));
     req.ctrl.cmd = PSAN_PUT;
     req.ctrl.seq = ((net_habitue_driver_SC101 *)getProvider())->getSequenceNumber();
@@ -861,23 +860,23 @@ void net_habitue_device_SC101::doSubmitIO(struct outstanding_io *io)
     req.sector = htonl(io->block);
     
     if (mbuf_allocpacket(MBUF_WAITOK, sizeof(req) + ioLen, NULL, &m) != 0)
-      KDEBUG("mbuf_allocpacket failed!"); // TODO(iwade) handle
+      KINFO("mbuf_allocpacket failed!"); // TODO(iwade) handle
 
     if (mbuf_copyback(m, 0, sizeof(req), &req, MBUF_WAITOK) != 0)
-      KDEBUG("mbuf_copyback failed!"); // TODO(iwade) handle
+      KINFO("mbuf_copyback failed!"); // TODO(iwade) handle
     
     if (!mbuf_buffer(io->buffer, 0, m, sizeof(req), ioLen))
-      KDEBUG("mbuf_buffer failed"); // TODO(iwade) handle
+      KINFO("mbuf_buffer failed"); // TODO(iwade) handle
 
     io->outstanding.seq = ntohs(req.ctrl.seq);
-    io->outstanding.len = sizeof(struct psan_put_response_t);
+    io->outstanding.len = sizeof(psan_put_response_t);
     io->outstanding.cmd = PSAN_PUT_RESPONSE;
   }
   else
   {
-    //KDEBUG("%p read %d %d (%d)", io, io->block, io->nblks, _outstandingCount);
+    KDEBUG("%p read %d %d (%d)", io, io->block, io->nblks, _outstandingCount);
     
-    struct psan_get_t req;
+    psan_get_t req;
     bzero(&req, sizeof(req));
     req.ctrl.cmd = PSAN_GET;
     req.ctrl.seq = ((net_habitue_driver_SC101 *)getProvider())->getSequenceNumber();
@@ -885,13 +884,13 @@ void net_habitue_device_SC101::doSubmitIO(struct outstanding_io *io)
     req.sector = htonl(io->block);
     
     if (mbuf_allocpacket(MBUF_WAITOK, sizeof(req), NULL, &m) != 0)
-      KDEBUG("mbuf_allocpacket failed!"); // TODO(iwade) handle
+      KINFO("mbuf_allocpacket failed!"); // TODO(iwade) handle
 
     if (mbuf_copyback(m, 0, sizeof(req), &req, MBUF_WAITOK) != 0)
-      KDEBUG("mbuf_copyback failed!"); // TODO(iwade) handle
+      KINFO("mbuf_copyback failed!"); // TODO(iwade) handle
     
     io->outstanding.seq = ntohs(req.ctrl.seq);
-    io->outstanding.len = sizeof(struct psan_get_response_t) + ioLen;
+    io->outstanding.len = sizeof(psan_get_response_t) + ioLen;
     io->outstanding.cmd = PSAN_GET_RESPONSE;
   }
   
@@ -901,11 +900,11 @@ void net_habitue_device_SC101::doSubmitIO(struct outstanding_io *io)
   io->outstanding.ctx = io;
   io->outstanding.timeout_ms = io->timeout_ms;
 
-  ((net_habitue_driver_SC101 *)getProvider())->sendPacket((struct sockaddr_in *)io->addr->getBytesNoCopy(), m, &io->outstanding);
+  ((net_habitue_driver_SC101 *)getProvider())->sendPacket((sockaddr_in *)io->addr->getBytesNoCopy(), m, &io->outstanding);
 }
 
 
-void net_habitue_device_SC101::completeIO(struct outstanding_io *io)
+void net_habitue_device_SC101::completeIO(outstanding_io *io)
 {
   STAILQ_REMOVE(&_outstandingHead, io, outstanding_io, entries);
   _outstandingCount--;
@@ -914,7 +913,7 @@ void net_habitue_device_SC101::completeIO(struct outstanding_io *io)
 }
 
 
-void net_habitue_device_SC101::queueIO(struct outstanding_io *io)
+void net_habitue_device_SC101::queueIO(outstanding_io *io)
 {
   STAILQ_INSERT_TAIL(&_pendingHead, io, entries);
   _pendingCount++;
@@ -923,7 +922,7 @@ void net_habitue_device_SC101::queueIO(struct outstanding_io *io)
 
 void net_habitue_device_SC101::dequeueAndSubmitIO()
 {
-  struct outstanding_io *io = STAILQ_FIRST(&_pendingHead);
+  outstanding_io *io = STAILQ_FIRST(&_pendingHead);
   
   if (io)
   {
@@ -940,6 +939,7 @@ void net_habitue_device_SC101::dequeueAndSubmitIO()
 
 
 struct deblock_master_state {
+  OSData *addr;
   IOMemoryDescriptor *buffer;
   UInt32 block;
   UInt32 nblks;
@@ -951,6 +951,7 @@ struct deblock_master_state {
   UInt64 actualByteCount;
 };
 
+
 struct deblock_state {
   struct deblock_master_state *master;
   IOMemoryDescriptor *buffer;
@@ -959,11 +960,11 @@ struct deblock_state {
 
 void deblockCompletion(void *target, void *parameter, IOReturn status, UInt64 actualByteCount)
 {
-  struct deblock_state *state = (struct deblock_state *)parameter;
-  struct deblock_master_state *master = state->master;
+  deblock_state *state = (deblock_state *)parameter;
+  deblock_master_state *master = state->master;
   
   state->buffer->release();
-  IODelete(state, struct deblock_state, 1);
+  IODelete(state, deblock_state, 1);
   
   master->pending--;
   master->actualByteCount += actualByteCount;
@@ -971,47 +972,44 @@ void deblockCompletion(void *target, void *parameter, IOReturn status, UInt64 ac
     master->status = status;
   
   if (!master->pending)
-  {
+  {    
     if (master->status != kIOReturnSuccess)
-      KDEBUG("deblock FAILED");
+      KINFO("deblock FAILED");
     
     IOStorage::complete(master->completion, master->status, master->actualByteCount);
     
-    IODelete(master, struct deblock_master_state, 1);
+    master->addr->release();
+    IODelete(master, deblock_master_state, 1);
   }
 }
 
-
-void net_habitue_device_SC101::deblock(IOMemoryDescriptor *buffer, UInt32 block, UInt32 nblks, IOStorageCompletion completion)
+void net_habitue_device_SC101::deblock(OSData *addr, IOMemoryDescriptor *buffer, UInt32 block, UInt32 nblks, IOStorageCompletion completion)
 {
   bool isWrite = (buffer->getDirection() == kIODirectionOut);
   const OSSymbol *ioMaxKey = (isWrite ? gSC101DeviceIOMaxWriteSizeKey : gSC101DeviceIOMaxReadSizeKey);
   UInt64 ioMaxSize = OSDynamicCast(OSNumber, getProperty(ioMaxKey))->unsigned64BitValue();
   UInt64 ioSize = (nblks * SECTOR_SIZE);
   
-  struct deblock_master_state *master = IONew(struct deblock_master_state, 1);
-  if (!master)
-    ; // TODO(iwade) handle
-  bzero(master, sizeof(*master));
+  deblock_master_state *master = IONewZero(deblock_master_state, 1);
+  master->addr = addr;
   master->buffer = buffer;
   master->block = block;
   master->nblks = nblks;
   master->completion = completion;
   master->status = kIOReturnSuccess;
     
+  master->addr->retain();
+  
   for (UInt64 used = 0, use = min(LSB(ioSize), ioMaxSize);
        used < ioSize;
        used += use, use = min(LSB(ioSize - used), ioMaxSize))
   {
-    struct deblock_state *state = IONew(struct deblock_state, 1);
-    if (!state)
-      ; // TODO(iwade) handle
-    bzero(state, sizeof(*state));
+    deblock_state *state = IONewZero(deblock_state, 1);
     state->master = master;
-    state->buffer = IOMemoryDescriptor::withSubRange(buffer, used, use, buffer->getDirection());
+    state->buffer = IOMemoryDescriptor::withSubRange(master->buffer, used, use, master->buffer->getDirection());
     if (!state->buffer)
-      ; // TODO(iwade) handle
-    
+      panic("alloc failed"); // TODO(iwade) handle
+
     IOStorageCompletion new_completion;
     new_completion.target = this;
     new_completion.action = deblockCompletion;
@@ -1019,8 +1017,8 @@ void net_habitue_device_SC101::deblock(IOMemoryDescriptor *buffer, UInt32 block,
     
     master->pending++;
     
-    //KDEBUG("deblock %s used=%llu, use=%llu", (isWrite ? "write" : "read"), used, use);
+    KDEBUG("deblock %s used=%llu, use=%llu", (isWrite ? "write" : "read"), used, use);
     
-    doAsyncReadWrite(state->buffer, block + used / SECTOR_SIZE, use / SECTOR_SIZE, new_completion);
+    prepareAndDoAsyncReadWrite(master->addr, state->buffer, master->block + used / SECTOR_SIZE, use / SECTOR_SIZE, new_completion);
   }
 }
